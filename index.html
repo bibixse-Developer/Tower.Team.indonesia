@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelas 8A YAPINA — Dashboard Kelas</title>
+<meta name="description" content="Dashboard Informasi Kelas 8A YAPINA">
+<style>
+:root{
+  --hijau-tua:      #00552e;
+  --hijau:          #007a3d;
+  --hijau-muda:     #2e9e5b;
+  --hijau-pupus:    #eaf7ef;
+  --hitam:          #12140f;
+  --hitam-lembut:   #1e2018;
+  --putih:          #ffffff;
+  --putih-soft:     #f7faf8;
+  --abu:            #64705f;
+  --kaca-bg:        rgba(255, 255, 255, 0.85);
+  --kaca-border:    rgba(0, 0, 0, 0.08);
+  --shadow-lembut:  0 4px 12px rgba(0, 40, 20, 0.06);
+  --shadow-kuat:    0 12px 30px rgba(0, 40, 20, 0.15);
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+*{ margin: 0; padding: 0; box-sizing: border-box; }
+body{
+  font-family: var(--font-body);
+  background-color: var(--putih-soft);
+  color: var(--hitam);
+  line-height: 1.5;
+  padding-bottom: 60px;
+}
+a{ text-decoration: none; color: inherit; }
+ul{ list-style: none; }
+button{ font-family: inherit; cursor: pointer; border: none; background: none; }
+.container{ max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.section{ padding: 40px 0; }
+.section-head{ text-align: center; margin-bottom: 30px; }
+.section-title{ font-size: 28px; font-weight: 800; color: var(--hitam); }
+.section-desc{ color: var(--abu); font-size: 15px; }
+.glass{
+  background: var(--kaca-bg);
+  border: 1px solid var(--kaca-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lembut);
+}
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  will-change: opacity, transform;
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+button, .admin-tab-btn, .modal-btn-submit, .btn-tambah-hari, .nav-links a {
+  transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+button:active, .admin-tab-btn:active, .modal-btn-submit:active, .btn-tambah-hari:active {
+  transform: scale(0.96);
+  box-shadow: 0 0 15px 4px rgba(46, 158, 91, 0.7) !important;
+  background-color: var(--hijau-muda) !important;
+  color: var(--putih) !important;
+}
+.navbar{
+  background: var(--hijau-tua);
+  color: var(--putih);
+  padding: 14px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-inner{ display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.nav-title{ font-weight: 800; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.nav-logo { width: 28px; height: 28px; object-fit: contain; border-radius: 4px; }
+.nav-right-area { display: flex; align-items: center; gap: 16px; }
+.nav-links{ display: flex; gap: 8px; }
+.nav-links a{
+  color: var(--putih);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+.nav-links a.active, .nav-links a:hover{ background: rgba(255,255,255,0.2); }
+.user-profile-nav { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.15); padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.user-avatar-badge { width: 24px; height: 24px; background: var(--hijau-muda); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: bold; }
+.jadwal-grid, .sosmed-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.jadwal-card{ padding: 20px; border-top: 4px solid var(--hijau); }
+.jadwal-card.today{ background: #e8f5e9; border-top-color: #2e7d32; }
+.jadwal-day{ font-size: 18px; font-weight: 800; margin-bottom: 12px; display: block; }
+.jadwal-list{ display: flex; flex-direction: column; gap: 8px; }
+.jadwal-item{ display: flex; gap: 8px; font-size: 13px; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.02); padding: 6px 10px; border-radius: 8px; }
+.jadwal-item-left{ display: flex; gap: 8px; align-items: center; flex: 1; min-width: 0; }
+.jadwal-item-left span:last-child{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jadwal-item .num{
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--hijau-pupus); color: var(--hijau-tua);
+  font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.jadwal-jam{ font-size: 11px; font-weight: 600; color: var(--abu); background: #fff; padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05); flex-shrink: 0; }
+.komentar-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.komentar-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.komentar-input, .komentar-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.komentar-input:focus, .komentar-textarea:focus {
+  border-color: var(--hijau-muda);
+}
+.komentar-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+.komentar-btn {
+  background: var(--hijau-tua);
+  color: var(--putih);
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.komentar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.komentar-item-card {
+  background: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+.komentar-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.komentar-author-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.komentar-author {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--hijau-tua);
+}
+.komentar-time {
+  font-size: 11px;
+  color: var(--abu);
+}
+.komentar-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.komentar-action-btn {
+  background: none;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.komentar-edit-btn { color: #f0ad4e; }
+.komentar-edit-btn:hover { background: #fcf8e3; }
+.komentar-delete-btn { color: #d9534f; }
+.komentar-delete-btn:hover { background: #fdf2f2; }
+.komentar-text {
+  font-size: 13px;
+  color: var(--hitam);
+  word-break: break-word;
+  white-space: pre-line;
+}
+.piket-table{ width: 100%; border-collapse: collapse; margin-top: 10px; }
+.piket-table th, .piket-table td{ padding: 12px 16px; text-align: left; }
+.piket-table thead th{ background: var(--hijau-tua); color: var(--putih); font-size: 14px; }
+.piket-table tbody tr{ border-bottom: 1px solid rgba(0,0,0,0.05); }
+.name-chip{
+  display: inline-block; background: var(--hijau-pupus); color: var(--hijau-tua);
+  font-weight: 600; font-size: 12px; padding: 4px 10px; border-radius: 12px; margin: 2px;
+}
+.sosmed-card{ padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+.sosmed-top{ display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.sosmed-icon{ width: 38px; height: 38px; border-radius: 10px; background: var(--hijau-pupus); color: var(--hijau-tua); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; flex-shrink: 0; }
+.sosmed-info h3{ font-size: 15px; font-weight: 700; color: var(--hitam); }
+.sosmed-info p{ font-size: 12px; color: var(--abu); }
+.link-preview-box {
+  display: block;
+  background: #fdfdfd;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+.link-preview-box:hover {
+  background: var(--putih-soft);
+  border-color: var(--hijau-muda);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+.link-preview-domain {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--hijau);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.link-preview-logo {
+  width: 14px; height: 14px; object-fit: contain; border-radius: 2px; vertical-align: middle;
+}
+.link-preview-title { font-size: 13px; font-weight: 700; color: var(--hitam); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.link-preview-url { font-size: 11px; color: var(--abu); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.footer{
+  background: var(--hijau-tua);
+  color: var(--putih);
+  padding: 40px 0 20px;
+  margin-top: 60px;
+}
+.footer-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  margin-bottom: 30px;
+}
+.footer-col h4{
+  font-size: 16px; font-weight: 700; margin-bottom: 14px; position: relative; padding-bottom: 8px;
+}
+.footer-col h4::after{
+  content: ''; position: absolute; left: 0; bottom: 0; width: 30px; height: 2px; background: var(--hijau-muda);
+}
+.footer-col p, .footer-col ul li a{
+  font-size: 14px; color: rgba(255, 255, 255, 0.8); margin-bottom: 8px; display: inline-block;
+}
+.footer-col ul li a:hover{ color: var(--putih); text-decoration: underline; }
+.footer-bottom{
+  text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 13px; color: rgba(255, 255, 255, 0.6);
+}
+.admin-fab{
+  position: fixed; bottom: 20px; right: 20px; z-index: 900;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: var(--hijau-tua); color: var(--putih);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-kuat);
+}
+.admin-status-dot{
+  position: absolute; top: 2px; right: 2px; width: 10px; height: 10px;
+  border-radius: 50%; background: #2ecc71; border: 2px solid #fff;
+}
+.modal-overlay{
+  position: fixed; inset: 0; z-index: 1200; background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  opacity: 0; visibility: hidden; transition: 0.2s ease;
+}
+.modal-overlay.show{ opacity: 1; visibility: visible; }
+.modal-box{
+  background: var(--putih); border-radius: var(--radius-lg);
+  width: 100%; max-width: 480px; padding: 28px; max-height: 85vh; overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+.modal-header{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-header h3 { font-size: 20px; font-weight: 800; color: var(--hijau-tua); }
+.admin-tabs{ display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.admin-tab-btn{
+  flex: 1; min-width: 70px; padding: 8px 6px; background: #eee; border-radius: 8px;
+  font-weight: 700; font-size: 11px; color: var(--abu); text-align: center;
+}
+.admin-tab-btn.active{ background: var(--hijau-tua); color: var(--putih); }
+.admin-tab-panel{ display: none; }
+.admin-tab-panel.active{ display: block; }
+.admin-edit-row{ border: 1px solid #eee; padding: 12px; margin-bottom: 10px; border-radius: 8px; background: #fafafa; }
+.admin-edit-row-top{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.input-hari { font-weight: bold; font-size: 14px; width: 60% !important; }
+.mapel-input-item, .piket-input-item, .sosmed-input-group{ display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.mapel-input-item{ flex-direction: row; align-items: center; }
+.input-mapel { flex: 2; }
+.input-jam { flex: 1; font-size: 12px !important; }
+input[type="text"], input[type="password"], textarea{
+  width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; font-family: inherit;
+}
+textarea{ resize: vertical; min-height: 60px; }
+.sosmed-input-group label{ font-size: 12px; font-weight: 700; color: var(--hijau-tua); }
+.modal-btn-submit{
+  width: 100%; padding: 12px; border-radius: 8px;
+  background: var(--hijau-tua); color: var(--putih); font-weight: 700; margin-top: 12px;
+}
+.btn-tambah-hari{
+  width: 100%; padding: 10px; background: var(--hijau-pupus); color: var(--hijau-tua);
+  border: 1px dashed var(--hijau); border-radius: 8px; font-weight: bold; font-size: 13px; margin-bottom: 14px;
+}
+.realtime-badge{
+  font-size: 12px; font-weight: 700; color: var(--hijau-tua);
+  background: var(--hijau-pupus); padding: 2px 8px; border-radius: 10px; margin-left: 6px;
+}
+.admin-danger-btn {
+  width: 100%; padding: 10px; border-radius: 8px; background: #d9534f; color: var(--putih); font-weight: 700; margin-top: 10px; font-size: 13px; text-align: center;
+}
+.admin-danger-btn:hover { background: #c9302c; }
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="container nav-inner">
+    <div class="nav-title">
+      <img src="https://www.google.com/s2/favicons?domain=yapina.sch.id&sz=64" alt="Logo" class="nav-logo">
+      Kelas 8A YAPINA
+    </div>
+    <div class="nav-right-area">
+      <ul class="nav-links">
+        <li><a href="#jadwal" class="active">Jadwal</a></li>
+        <li><a href="#komentar">Komentar</a></li>
+        <li><a href="#piket">Piket</a></li>
+        <li><a href="#sosmed">Sosial Media</a></li>
+      </ul>
+      <div class="user-profile-nav" id="userProfileNav" title="Klik untuk Login/Logout">
+        <div class="user-avatar-badge" id="userAvatarBadge">A</div>
+        <span id="userNavText">Admin</span>
+      </div>
+    </div>
+  </div>
+</nav>
+<section class="section reveal" id="jadwal">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Jadwal Pelajaran <span class="realtime-badge">Realtime</span></h2>
+      <p class="section-desc">Susunan mata pelajaran Kelas 8A</p>
+    </div>
+    <div class="jadwal-grid" id="jadwalGrid"></div>
+  </div>
+</section>
+<section class="section reveal" id="komentar">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Komunikasi & Komentar Kelas</h2>
+      <p class="section-desc">Tulis pesan, saran, atau kesan untuk kelas 8A</p>
+    </div>
+    <div class="glass komentar-container">
+      <form class="komentar-form" id="komentarForm">
+        <input type="text" id="komentarNama" class="komentar-input" placeholder="Nama Anda..." required autocomplete="off">
+        <textarea id="komentarPesan" class="komentar-textarea" placeholder="Tulis komentar atau pesan di sini..." required></textarea>
+        <button type="submit" class="komentar-btn">Kirim Komentar</button>
+      </form>
+      <div class="komentar-list" id="komentarList"></div>
+    </div>
+  </div>
+</section>
+<section class="section reveal" id="piket">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Jadwal Piket Harian</h2>
+      <p class="section-desc">Daftar petugas kebersihan kelas</p>
+    </div>
+    <div class="glass" style="overflow-x:auto;">
+      <table class="piket-table">
+        <thead>
+          <tr>
+            <th>Hari</th>
+            <th>Petugas</th>
+          </tr>
+        </thead>
+        <tbody id="piketBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<section class="section reveal" id="sosmed">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Sosial Media Sekolah</h2>
+      <p class="section-desc">Kunjungi saluran resmi sekolah</p>
+    </div>
+    <div class="sosmed-grid" id="sosmedGrid"></div>
+  </div>
+</section>
+<footer class="footer reveal" id="footerSection">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4 id="footTitle1">Tentang Kelas 8A</h4>
+        <p id="footDesc1">Dashboard informasi resmi Kelas 8A YAPINA. Membantu siswa, guru, dan wali murid memantau jadwal pelajaran, jadwal piket, serta informasi terkini secara real-time.</p>
+      </div>
+      <div class="footer-col">
+        <h4 id="footTitle2">Navigasi Cepat</h4>
+        <ul>
+          <li><a href="#jadwal">Jadwal Pelajaran</a></li>
+          <li><a href="#komentar">Komentar</a></li>
+          <li><a href="#piket">Jadwal Piket</a></li>
+          <li><a href="#sosmed">Sosial Media Sekolah</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 id="footTitle3">Kontak & Informasi</h4>
+        <p id="footContactTitle"><strong>YAPINA</strong></p>
+        <p id="footContactDesc">Pusat Informasi & Administrasi Kelas</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p id="footCopyright">&copy; 2026 Kelas 8A YAPINA. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+<button class="admin-fab" id="adminFab" aria-label="Buka Panel Admin">
+  <span class="admin-status-dot" id="adminStatusDot"></span>
+  ⚙️
+</button>
+<div class="modal-overlay" id="adminPanelModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="adminModalTitle">Panel Edit Admin</h3>
+      <button id="closeAdminPanel" style="font-size:18px; font-weight:bold;">✕</button>
+    </div>
+    <div class="admin-tabs" id="adminTabsContainer">
+      <button class="admin-tab-btn active" data-tab="tabJadwal">Jadwal</button>
+      <button class="admin-tab-btn" data-tab="tabPiket">Piket</button>
+      <button class="admin-tab-btn" data-tab="tabSosmed">Sosmed</button>
+      <button class="admin-tab-btn" data-tab="tabFooter">Footer</button>
+      <button class="admin-tab-btn" data-tab="tabAkun">Akun</button>
+    </div>
+    <div class="admin-tab-panel active" id="tabJadwal">
+      <button type="button" class="btn-tambah-hari" onclick="window.addNewJadwalHari()">+ Tambah Hari Baru (Jadwal)</button>
+      <div id="jadwalEditList"></div>
+    </div>
+    <div class="admin-tab-panel" id="tabPiket">
+      <button type="button" class="btn-tambah-hari" onclick="window.addNewPiketHari()">+ Tambah Hari Baru (Piket)</button>
+      <div id="piketEditList"></div>
+    </div>
+    <div class="admin-tab-panel" id="tabSosmed">
+      <button type="button" class="btn-tambah-hari" onclick="window.addNewSosmed()">+ Tambah Sosial Media</button>
+      <div id="sosmedEditList"></div>
+    </div>
+    <div class="admin-tab-panel" id="tabFooter">
+      <div id="footerEditList"></div>
+    </div>
+    <div class="admin-tab-panel" id="tabAkun">
+      <div class="admin-edit-row">
+        <div class="sosmed-input-group"><label>Password Admin Baru:</label><input type="password" id="newAdminPassword" placeholder="Masukkan password baru..."></div>
+        <button type="button" class="modal-btn-submit" id="saveNewPasswordBtn">Simpan Password Baru</button>
+        <div id="passChangeStatus" style="font-size:12px; text-align:center; margin-top:6px;"></div>
+      </div>
+      <button type="button" class="admin-danger-btn" id="logoutAdminBtn">Keluar dari Admin</button>
+    </div>
+    <div id="saveChangesWrapper">
+      <button class="modal-btn-submit" id="saveAdminChanges">Simpan Perubahan ke Firebase</button>
+      <div id="saveStatus" style="font-size:12px; text-align:center; margin-top:8px;"></div>
+    </div>
+  </div>
+</div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+  import { getDatabase, ref, onValue, set, push, update, remove, child, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyBRueA04UdA3Kd46eLAJdE3xGfnqffFTDg",
+    authDomain: "test-2b638.firebaseapp.com",
+    databaseURL: "https://test-2b638-default-rtdb.firebaseio.com",
+    projectId: "test-2b638",
+    storageBucket: "test-2b638-default-rtdb.firebasestorage.app",
+    messagingSenderId: "719275461939",
+    appId: "1:719275461939:web:61e1ec100a1705345a8246",
+    measurementId: "G-W5NBTRQRE9"
+  };
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getDatabase(app);
+  const fbRefs = {
+    jadwalRef: ref(db, "kelas8a/jadwal"),
+    piketRef: ref(db, "kelas8a/piket"),
+    sosmedRef: ref(db, "kelas8a/sosmed"),
+    footerRef: ref(db, "kelas8a/footer"),
+    komentarRef: ref(db, "kelas8a/komentar"),
+    authRef: ref(db, "kelas8a/auth")
+  };
+  const DEFAULT_JADWAL = [
+    { hari: "Senin",  dayIndex: 1, mapel: [
+      { nama: "Bahasa Indonesia", jam: "07:30 - 09:00" },
+      { nama: "PKn", jam: "09:00 - 10:15" },
+      { nama: "Tahfidz", jam: "10:30 - 11:30" },
+      { nama: "IPA", jam: "12:30 - 14:00" }
+    ] },
+    { hari: "Selasa", dayIndex: 2, mapel: [
+      { nama: "PJOK", jam: "07:30 - 09:00" },
+      { nama: "Public Speaking", jam: "09:00 - 10:15" },
+      { nama: "IPA", jam: "10:30 - 11:30" },
+      { nama: "Bahasa Arab Imla", jam: "12:30 - 14:00" }
+    ] },
+    { hari: "Rabu",   dayIndex: 3, mapel: [
+      { nama: "TIK", jam: "07:30 - 09:00" },
+      { nama: "Mabadi Fiqih dan Wirid", jam: "09:00 - 10:15" },
+      { nama: "Bahasa Inggris", jam: "10:30 - 11:30" },
+      { nama: "Matematika", jam: "12:30 - 14:00" }
+    ] },
+    { hari: "Kamis",  dayIndex: 4, mapel: [
+      { nama: "Matematika", jam: "07:30 - 09:00" },
+      { nama: "Bahasa Arab", jam: "09:00 - 10:15" },
+      { nama: "Al-Qur'an Hadits", jam: "10:30 - 11:30" },
+      { nama: "Aqidah", jam: "12:30 - 14:00" }
+    ] },
+    { hari: "Jumat",  dayIndex: 5, mapel: [
+      { nama: "Grammar", jam: "07:30 - 08:30" },
+      { nama: "IPS", jam: "08:30 - 09:30" },
+      { nama: "Tahfidz", jam: "09:45 - 10:30" },
+      { nama: "Seni Budaya", jam: "10:30 - 11:30" }
+    ] }
+  ];
+  const DEFAULT_PIKET = [
+    { hari: "Senin", petugas: ["Adera", "Annisa", "Rifa", "Rizky", "Zami", "Faris"] },
+    { hari: "Selasa", petugas: ["Junika", "Alya", "Arham", "Naqi", "Tyo", "Ezy"] },
+    { hari: "Rabu", petugas: ["Nayla", "Messia", "Yusuf", "Zaldan", "Arif", "Hafip"] },
+    { hari: "Kamis", petugas: ["Farisha", "Zahra", "Alifah", "Maulana", "Ibnu", "Fadli", "Iyan"] },
+    { hari: "Jumat", petugas: ["Nindy", "Ais", "Rifky", "Hafidz", "Ibad", "Abid"] }
+  ];
+  const DEFAULT_SOSMED = [
+    { platform: "TikTok", handle: "@yapina.official", url: "https://www.tiktok.com/@yapina.official?_r=1&_t=ZS-98KCLrry6GA" },
+    { platform: "YouTube", handle: "YAPINA TV", url: "https://www.youtube.com/@yapina.official" },
+    { platform: "Instagram", handle: "@yapina.official", url: "https://www.instagram.com/yapina.official?igsh=cjB4ZGxtNDN2dzZl" }
+  ];
+  const DEFAULT_FOOTER = {
+    title1: "Tentang Kelas 8A",
+    desc1: "Dashboard informasi resmi Kelas 8A YAPINA. Membantu siswa, guru, dan wali murid memantau jadwal pelajaran, jadwal piket, serta informasi terkini secara real-time.",
+    title2: "Navigasi Cepat",
+    title3: "Kontak & Informasi",
+    contactTitle: "YAPINA",
+    contactDesc: "Pusat Informasi & Administrasi Kelas",
+    copyright: "&copy; 2026 Kelas 8A YAPINA. All rights reserved."
+  };
+  const DEFAULT_AUTH = { password: "11qq@@aa" };
+
+
+  let DATA_JADWAL = DEFAULT_JADWAL;
+  let DATA_PIKET = DEFAULT_PIKET;
+  let DATA_SOSMED = DEFAULT_SOSMED;
+  let DATA_FOOTER = DEFAULT_FOOTER;
+  let DATA_AUTH = DEFAULT_AUTH;
+  let DATA_KOMENTAR = [];
+ 
+  let isAdminLoggedIn = localStorage.getItem("kelas8a_admin_logged") === "true";
+
+
+  function updateAuthUI() {
+    const navText = document.getElementById("userNavText");
+    const avatarBadge = document.getElementById("userAvatarBadge");
+    if (isAdminLoggedIn) {
+      if (navText) navText.textContent = "Admin";
+      if (avatarBadge) avatarBadge.textContent = "A";
+    } else {
+      if (navText) navText.textContent = "Login";
+      if (avatarBadge) avatarBadge.textContent = "L";
+    }
+  }
+
+
+  function setAdminOnlineStatus(isOnline){
+    const dot = document.getElementById("adminStatusDot");
+    if (dot) dot.classList.toggle("online", isOnline);
+  }
+
+
+  async function checkAndInitDatabase() {
+    try {
+      const snapshot = await get(child(ref(db), "kelas8a"));
+      if (!snapshot.exists()) {
+        await set(fbRefs.jadwalRef, DEFAULT_JADWAL);
+        await set(fbRefs.piketRef, DEFAULT_PIKET);
+        await set(fbRefs.sosmedRef, DEFAULT_SOSMED);
+        await set(fbRefs.footerRef, DEFAULT_FOOTER);
+        await set(fbRefs.authRef, DEFAULT_AUTH);
+      } else {
+        const val = snapshot.val();
+        if (val && !val.footer) await set(fbRefs.footerRef, DEFAULT_FOOTER);
+        if (val && !val.auth) await set(fbRefs.authRef, DEFAULT_AUTH);
+      }
+    } catch (e) {
+      console.error("Gagal inisialisasi:", e);
+    }
+  }
+  checkAndInitDatabase();
+
+
+  onValue(fbRefs.authRef, (snapshot) => {
+    const val = snapshot.val();
+    if (val && val.password) {
+      DATA_AUTH = val;
+    }
+  });
+
+
+  onValue(fbRefs.jadwalRef, (snapshot) => {
+    const val = snapshot.val();
+    if (val && Array.isArray(val) && val.length > 0) {
+      DATA_JADWAL = val.map(d => ({
+        ...d,
+        mapel: (d.mapel || []).map(m => typeof m === 'string' ? { nama: m, jam: "" } : m)
+      }));
+    }
+    renderJadwal();
+    setAdminOnlineStatus(true);
+  }, () => setAdminOnlineStatus(false));
+
+
+  onValue(fbRefs.piketRef, (snapshot) => {
+    const val = snapshot.val();
+    if (val && Array.isArray(val) && val.length > 0) DATA_PIKET = val;
+    renderPiket();
+  });
+  onValue(fbRefs.sosmedRef, (snapshot) => {
+    const val = snapshot.val();
+    if (val && Array.isArray(val) && val.length > 0) DATA_SOSMED = val;
+    renderSosmed();
+  });
+  onValue(fbRefs.footerRef, (snapshot) => {
+    const val = snapshot.val();
+    if (val) DATA_FOOTER = { ...DEFAULT_FOOTER, ...val };
+    renderFooter();
+  });
+  onValue(fbRefs.komentarRef, (snapshot) => {
+    const val = snapshot.val();
+    DATA_KOMENTAR = [];
+    if (val) {
+      Object.keys(val).forEach(key => {
+        DATA_KOMENTAR.push({ id: key, ...val[key] });
+      });
+      DATA_KOMENTAR.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    }
+    renderKomentar();
+  });
+
+
+  const komentarForm = document.getElementById("komentarForm");
+  komentarForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const namaInput = document.getElementById("komentarNama");
+    const pesanInput = document.getElementById("komentarPesan");
+   
+    const nama = namaInput.value.trim();
+    const pesan = pesanInput.value.trim();
+   
+    if(!nama || !pesan) return;
+    try {
+      await push(fbRefs.komentarRef, {
+        nama: nama,
+        pesan: pesan,
+        timestamp: Date.now()
+      });
+      pesanInput.value = "";
+    } catch (err) {
+      alert("Gagal mengirim komentar: " + err.message);
+    }
+  });
+
+
+  window.editKomentar = async (idKomentar, namaLama, pesanLama) => {
+    if (!isAdminLoggedIn) {
+      alert("Anda harus login sebagai admin untuk mengedit komentar!");
+      openAdminPanelModal();
+      return;
+    }
+    const namaBaru = prompt("Edit Nama Pengirim:", namaLama);
+    if (namaBaru === null) return;
+    const pesanBaru = prompt("Edit Pesan Komentar:", pesanLama);
+    if (pesanBaru === null) return;
+    if (!namaBaru.trim() || !pesanBaru.trim()) {
+      alert("Nama dan pesan tidak boleh kosong!");
+      return;
+    }
+    try {
+      await update(ref(db, `kelas8a/komentar/${idKomentar}`), {
+        nama: namaBaru.trim(),
+        pesan: pesanBaru.trim()
+      });
+    } catch (err) {
+      alert("Gagal mengedit komentar: " + err.message);
+    }
+  };
+
+
+  window.hapusKomentar = async (idKomentar) => {
+    if (!isAdminLoggedIn) {
+      alert("Anda harus login sebagai admin untuk menghapus komentar!");
+      openAdminPanelModal();
+      return;
+    }
+    if(confirm("Yakin ingin menghapus komentar ini?")) {
+      try {
+        await remove(ref(db, `kelas8a/komentar/${idKomentar}`));
+      } catch (err) {
+        alert("Gagal menghapus komentar: " + err.message);
+      }
+    }
+  };
+
+
+  function escapeAttr(str){
+    return String(str || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function getCleanDomain(urlStr) {
+    try {
+      const u = new URL(urlStr);
+      return u.hostname.replace('www.', '');
+    } catch(e) {
+      return urlStr;
+    }
+  }
+
+
+  function renderJadwal(){
+    const grid = document.getElementById("jadwalGrid");
+    if(!grid) return;
+    const todayIndex = new Date().getDay();
+    grid.innerHTML = DATA_JADWAL.map(d => {
+      const isToday = d.dayIndex === todayIndex;
+      const listItems = (d.mapel || []).map((m, idx) => `
+        <li class="jadwal-item">
+          <div class="jadwal-item-left">
+            <span class="num">${idx + 1}</span>
+            <span>${escapeAttr(m.nama)}</span>
+          </div>
+          ${m.jam ? `<span class="jadwal-jam">${escapeAttr(m.jam)}</span>` : ''}
+        </li>`).join("");
+      return `
+        <div class="jadwal-card glass ${isToday ? "today" : ""}">
+          <span class="jadwal-day">${escapeAttr(d.hari)}</span>
+          <ul class="jadwal-list">${listItems}</ul>
+        </div>`;
+    }).join("");
+  }
+
+
+  function renderKomentar(){
+    const listEl = document.getElementById("komentarList");
+    if(!listEl) return;
+    if(DATA_KOMENTAR.length === 0) {
+      listEl.innerHTML = `<div style="text-align:center; color:var(--abu); font-size:13px; padding:20px;">Belum ada komentar. Jadilah yang pertama berkomentar!</div>`;
+      return;
+    }
+    listEl.innerHTML = DATA_KOMENTAR.map(item => {
+      const dateStr = item.timestamp ? new Date(item.timestamp).toLocaleString("id-ID", { dateStyle: 'medium', timeStyle: 'short' }) : 'Baru saja';
+      return `
+        <div class="komentar-item-card">
+          <div class="komentar-item-header">
+            <div class="komentar-author-area">
+              <span class="komentar-author">${escapeAttr(item.nama)}</span>
+              <span class="komentar-time">• ${dateStr}</span>
+            </div>
+            ${isAdminLoggedIn ? `
+            <div class="komentar-actions">
+              <button type="button" class="komentar-action-btn komentar-edit-btn" onclick="window.editKomentar('${item.id}', '${escapeAttr(item.nama)}', '${escapeAttr(item.pesan)}')" title="Edit Komentar">✏️ Edit</button>
+              <button type="button" class="komentar-action-btn komentar-delete-btn" onclick="window.hapusKomentar('${item.id}')" title="Hapus Komentar">🗑️ Hapus</button>
+            </div>` : ''}
+          </div>
+          <div class="komentar-text">${escapeAttr(item.pesan)}</div>
+        </div>`;
+    }).join("");
+  }
+
+
+  function renderPiket(){
+    const body = document.getElementById("piketBody");
+    if(!body) return;
+    body.innerHTML = DATA_PIKET.map(row => `
+      <tr>
+        <td><strong>${escapeAttr(row.hari)}</strong></td>
+        <td>${(row.petugas || []).map(p => `<span class="name-chip">${escapeAttr(p)}</span>`).join("")}</td>
+      </tr>`).join("");
+  }
+
+
+  function renderSosmed(){
+    const grid = document.getElementById("sosmedGrid");
+    if(!grid) return;
+    grid.innerHTML = DATA_SOSMED.map(item => {
+      const iconLetter = (item.platform || "S").charAt(0).toUpperCase();
+      const domainName = getCleanDomain(item.url);
+      const faviconUrl = `https://www.google.com/s2/favicons?domain=${domainName}&sz=32`;
+      return `
+        <div class="sosmed-card glass">
+          <div>
+            <div class="sosmed-top">
+              <div class="sosmed-icon">${iconLetter}</div>
+              <div class="sosmed-info">
+                <h3>${escapeAttr(item.platform)}</h3>
+                <p>${escapeAttr(item.handle)}</p>
+              </div>
+            </div>
+            <a href="${escapeAttr(item.url)}" target="_blank" class="link-preview-box">
+              <div class="link-preview-domain">
+                <img src="${faviconUrl}" alt="" class="link-preview-logo"> ${escapeAttr(domainName)}
+              </div>
+              <div class="link-preview-title">${escapeAttr(item.platform)} — ${escapeAttr(item.handle)}</div>
+              <div class="link-preview-url">${escapeAttr(item.url)}</div>
+            </a>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+
+  function renderFooter(){
+    document.getElementById("footTitle1").textContent = DATA_FOOTER.title1 || "";
+    document.getElementById("footDesc1").textContent = DATA_FOOTER.desc1 || "";
+    document.getElementById("footTitle2").textContent = DATA_FOOTER.title2 || "";
+    document.getElementById("footTitle3").textContent = DATA_FOOTER.title3 || "";
+    document.getElementById("footContactTitle").innerHTML = `<strong>${escapeAttr(DATA_FOOTER.contactTitle)}</strong>`;
+    document.getElementById("footContactDesc").textContent = DATA_FOOTER.contactDesc || "";
+    document.getElementById("footCopyright").innerHTML = DATA_FOOTER.copyright || "";
+  }
+
+
+  let draftJadwal = [], draftPiket = [], draftSosmed = [], draftFooter = {};
+  const adminFab = document.getElementById("adminFab");
+  const adminModal = document.getElementById("adminPanelModal");
+  const userProfileNav = document.getElementById("userProfileNav");
+
+
+  function openAdminPanelModal() {
+    if (!isAdminLoggedIn) {
+      showLoginModal();
+      return;
+    }
+    draftJadwal = JSON.parse(JSON.stringify(DATA_JADWAL));
+    draftPiket = JSON.parse(JSON.stringify(DATA_PIKET));
+    draftSosmed = JSON.parse(JSON.stringify(DATA_SOSMED));
+    draftFooter = JSON.parse(JSON.stringify(DATA_FOOTER));
+    document.getElementById("saveStatus").textContent = "";
+    document.getElementById("passChangeStatus").textContent = "";
+    document.getElementById("newAdminPassword").value = "";
+   
+    document.getElementById("adminModalTitle").textContent = "Panel Edit Admin";
+    document.getElementById("adminTabsContainer").style.display = "flex";
+    document.getElementById("saveChangesWrapper").style.display = "block";
+   
+    renderJadwalEditForm();
+    renderPiketEditForm();
+    renderSosmedEditForm();
+    renderFooterEditForm();
+   
+    // Switch to first tab by default
+    document.querySelectorAll(".admin-tab-btn")[0].click();
+    adminModal.classList.add("show");
+  }
+
+
+  function showLoginModal() {
+    document.getElementById("adminModalTitle").textContent = "Login Admin Kelas";
+    document.getElementById("adminTabsContainer").style.display = "none";
+    document.getElementById("saveChangesWrapper").style.display = "none";
+   
+    document.querySelectorAll(".admin-tab-panel").forEach(p => p.classList.remove("active"));
+    const loginPanelId = "tabLoginCustom";
+    let loginPanel = document.getElementById(loginPanelId);
+    if (!loginPanel) {
+      loginPanel = document.createElement("div");
+      loginPanel.id = loginPanelId;
+      loginPanel.className = "admin-tab-panel active";
+      loginPanel.innerHTML = `
+        <div class="admin-edit-row">
+          <div class="sosmed-input-group" style="margin-bottom:12px;">
+            <label>Password Admin:</label>
+            <input type="password" id="loginPasswordInput" placeholder="Masukkan password admin...">
+          </div>
+          <button type="button" class="modal-btn-submit" id="submitLoginBtn">Masuk ke Panel Admin</button>
+          <div id="loginStatusMsg" style="font-size:12px; text-align:center; margin-top:8px; color:red;"></div>
+        </div>
+      `;
+      adminModal.querySelector(".modal-box").insertBefore(loginPanel, document.getElementById("saveChangesWrapper"));
+    } else {
+      loginPanel.classList.add("active");
+      document.getElementById("loginPasswordInput").value = "";
+      document.getElementById("loginStatusMsg").textContent = "";
+    }
+
+
+    document.getElementById("submitLoginBtn").onclick = () => {
+      const typedPass = document.getElementById("loginPasswordInput").value;
+      const currentValidPass = (DATA_AUTH && DATA_AUTH.password) ? DATA_AUTH.password : "11qq@@aa";
+      if (typedPass === currentValidPass) {
+        isAdminLoggedIn = true;
+        localStorage.setItem("kelas8a_admin_logged", "true");
+        updateAuthUI();
+        renderKomentar();
+        adminModal.classList.remove("show");
+        openAdminPanelModal();
+      } else {
+        document.getElementById("loginStatusMsg").textContent = "Password salah!";
+      }
+    };
+
+
+    adminModal.classList.add("show");
+  }
+
+
+  adminFab.style.display = "flex";
+  adminFab.onclick = () => openAdminPanelModal();
+  if (userProfileNav) {
+    userProfileNav.onclick = () => {
+      if (isAdminLoggedIn) {
+        openAdminPanelModal();
+      } else {
+        showLoginModal();
+      }
+    };
+  }
+
+
+  document.getElementById("closeAdminPanel").addEventListener("click", () => adminModal.classList.remove("show"));
+  document.querySelectorAll(".admin-tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".admin-tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".admin-tab-panel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      const targetPanel = document.getElementById(btn.dataset.tab);
+      if (targetPanel) targetPanel.classList.add("active");
+    });
+  });
+
+
+  document.getElementById("logoutAdminBtn").addEventListener("click", () => {
+    if (confirm("Apakah Anda yakin ingin keluar dari sesi admin?")) {
+      isAdminLoggedIn = false;
+      localStorage.removeItem("kelas8a_admin_logged");
+      updateAuthUI();
+      renderKomentar();
+      adminModal.classList.remove("show");
+    }
+  });
+
+
+  document.getElementById("saveNewPasswordBtn").addEventListener("click", async () => {
+    const newPass = document.getElementById("newAdminPassword").value.trim();
+    const statusMsg = document.getElementById("passChangeStatus");
+    if (!newPass) {
+      statusMsg.style.color = "red";
+      statusMsg.textContent = "Password baru tidak boleh kosong!";
+      return;
+    }
+    try {
+      await set(fbRefs.authRef, { password: newPass });
+      statusMsg.style.color = "green";
+      statusMsg.textContent = "Password admin berhasil diperbarui!";
+      document.getElementById("newAdminPassword").value = "";
+    } catch (err) {
+      statusMsg.style.color = "red";
+      statusMsg.textContent = "Gagal mengubah password: " + err.message;
+    }
+  });
+
+
+  function renderJadwalEditForm(){
+    const wrap = document.getElementById("jadwalEditList");
+    wrap.innerHTML = draftJadwal.map((d, di) => `
+      <div class="admin-edit-row" data-jadwal-index="${di}">
+        <div class="admin-edit-row-top">
+          <input type="text" class="input-hari input-jadwal-hari" value="${escapeAttr(d.hari)}" placeholder="Nama Hari">
+          <button type="button" onclick="window.removeJadwalHari(${di})" style="color:red; font-weight:bold; font-size:13px;">🗑️ Hapus Hari</button>
+        </div>
+        <div class="mapel-inputs">
+          ${(d.mapel || []).map((m, mi) => `
+            <div class="mapel-input-item">
+              <input type="text" class="input-mapel" value="${escapeAttr(m.nama)}" placeholder="Mata Pelajaran">
+              <input type="text" class="input-jam" value="${escapeAttr(m.jam)}" placeholder="Jam (cth: 07:30 - 09:00)">
+              <button type="button" onclick="window.removeMapel(${di}, ${mi})">❌</button>
+            </div>`).join("")}
+        </div>
+        <button type="button" onclick="window.addMapel(${di})" style="font-size:12px; color:var(--hijau-tua); font-weight:bold; margin-top:6px;">+ Tambah Mapel</button>
+      </div>`).join("");
+  }
+  function renderPiketEditForm(){
+    const wrap = document.getElementById("piketEditList");
+    wrap.innerHTML = draftPiket.map((r, ri) => `
+      <div class="admin-edit-row" data-piket-index="${ri}">
+        <div class="admin-edit-row-top">
+          <input type="text" class="input-hari input-piket-hari" value="${escapeAttr(r.hari)}" placeholder="Nama Hari">
+          <button type="button" onclick="window.removePiketHari(${ri})" style="color:red; font-weight:bold; font-size:13px;">🗑️ Hapus Hari</button>
+        </div>
+        <div class="petugas-inputs">
+          ${(r.petugas || []).map((p, pi) => `
+            <div class="piket-input-item">
+              <input type="text" class="input-petugas" value="${escapeAttr(p)}">
+              <button type="button" onclick="window.removePetugas(${ri}, ${pi})">❌</button>
+            </div>`).join("")}
+        </div>
+        <button type="button" onclick="window.addPetugas(${ri})" style="font-size:12px; color:var(--hijau-tua); font-weight:bold; margin-top:6px;">+ Tambah Petugas</button>
+      </div>`).join("");
+  }
+  function renderSosmedEditForm(){
+    const wrap = document.getElementById("sosmedEditList");
+    wrap.innerHTML = draftSosmed.map((s, si) => `
+      <div class="admin-edit-row" data-sosmed-index="${si}">
+        <div class="admin-edit-row-top">
+          <input type="text" class="input-hari input-sosmed-platform" value="${escapeAttr(s.platform)}" placeholder="Platform (cth: Instagram)">
+          <button type="button" onclick="window.removeSosmed(${si})" style="color:red; font-weight:bold; font-size:13px;">🗑️ Hapus</button>
+        </div>
+        <div class="sosmed-input-group" style="margin-top:6px;">
+          <label>Nama/Handle Akun:</label>
+          <input type="text" class="input-sosmed-handle" value="${escapeAttr(s.handle)}" placeholder="cth: @yapina.official">
+        </div>
+        <div class="sosmed-input-group">
+          <label>Link URL:</label>
+          <input type="text" class="input-sosmed-url" value="${escapeAttr(s.url)}" placeholder="cth: https://instagram.com/...">
+        </div>
+      </div>`).join("");
+  }
+  function renderFooterEditForm(){
+    const wrap = document.getElementById("footerEditList");
+    wrap.innerHTML = `
+      <div class="admin-edit-row" id="footerEditFormBox">
+        <div class="sosmed-input-group"><label>Judul Kolom 1 (Tentang):</label><input type="text" id="f_title1" value="${escapeAttr(draftFooter.title1)}"></div>
+        <div class="sosmed-input-group"><label>Deskripsi Kolom 1:</label><textarea id="f_desc1">${escapeAttr(draftFooter.desc1)}</textarea></div>
+        <div class="sosmed-input-group"><label>Judul Kolom 2 (Navigasi):</label><input type="text" id="f_title2" value="${escapeAttr(draftFooter.title2)}"></div>
+        <div class="sosmed-input-group"><label>Judul Kolom 3 (Kontak):</label><input type="text" id="f_title3" value="${escapeAttr(draftFooter.title3)}"></div>
+        <div class="sosmed-input-group"><label>Nama Instansi/Kontak:</label><input type="text" id="f_contactTitle" value="${escapeAttr(draftFooter.contactTitle)}"></div>
+        <div class="sosmed-input-group"><label>Keterangan Kontak:</label><input type="text" id="f_contactDesc" value="${escapeAttr(draftFooter.contactDesc)}"></div>
+        <div class="sosmed-input-group"><label>Teks Hak Cipta (Copyright):</label><input type="text" id="f_copyright" value="${escapeAttr(draftFooter.copyright)}"></div>
+      </div>
+    `;
+  }
+  window.addNewJadwalHari = () => {
+    syncDraftFromDOM();
+    draftJadwal.push({ hari: "Hari Baru", dayIndex: 0, mapel: [{ nama: "", jam: "" }] });
+    renderJadwalEditForm();
+  };
+  window.removeJadwalHari = (di) => {
+    syncDraftFromDOM();
+    draftJadwal.splice(di, 1);
+    renderJadwalEditForm();
+  };
+  window.addNewPiketHari = () => {
+    syncDraftFromDOM();
+    draftPiket.push({ hari: "Hari Baru", petugas: [""] });
+    renderPiketEditForm();
+  };
+  window.removePiketHari = (ri) => {
+    syncDraftFromDOM();
+    draftPiket.splice(ri, 1);
+    renderPiketEditForm();
+  };
+  window.addNewSosmed = () => {
+    syncDraftFromDOM();
+    draftSosmed.push({ platform: "Platform Baru", handle: "", url: "" });
+    renderSosmedEditForm();
+  };
+  window.removeSosmed = (si) => {
+    syncDraftFromDOM();
+    draftSosmed.splice(si, 1);
+    renderSosmedEditForm();
+  };
+  window.addMapel = (di) => {
+    syncDraftFromDOM();
+    draftJadwal[di].mapel.push({ nama: "", jam: "" });
+    renderJadwalEditForm();
+  };
+  window.removeMapel = (di, mi) => {
+    syncDraftFromDOM();
+    draftJadwal[di].mapel.splice(mi, 1);
+    renderJadwalEditForm();
+  };
+  window.addPetugas = (ri) => {
+    syncDraftFromDOM();
+    draftPiket[ri].petugas.push("");
+    renderPiketEditForm();
+  };
+  window.removePetugas = (ri, pi) => {
+    syncDraftFromDOM();
+    draftPiket[ri].petugas.splice(pi, 1);
+    renderPiketEditForm();
+  };
+  function syncDraftFromDOM() {
+    document.querySelectorAll("#jadwalEditList .admin-edit-row").forEach((row, di) => {
+      const hariInput = row.querySelector(".input-jadwal-hari");
+      if(draftJadwal[di]) {
+        draftJadwal[di].hari = hariInput ? hariInput.value : "";
+      }
+      const mapels = [];
+      row.querySelectorAll(".mapel-input-item").forEach(item => {
+        const namaInput = item.querySelector(".input-mapel");
+        const jamInput = item.querySelector(".input-jam");
+        mapels.push({
+          nama: namaInput ? namaInput.value : "",
+          jam: jamInput ? jamInput.value : ""
+        });
+      });
+      if(draftJadwal[di]) draftJadwal[di].mapel = mapels;
+    });
+    document.querySelectorAll("#piketEditList .admin-edit-row").forEach((row, ri) => {
+      const hariInput = row.querySelector(".input-piket-hari");
+      if(draftPiket[ri]) {
+        draftPiket[ri].hari = hariInput ? hariInput.value : "";
+      }
+      const petugases = [];
+      row.querySelectorAll(".input-petugas").forEach(input => petugases.push(input.value));
+      if(draftPiket[ri]) draftPiket[ri].petugas = petugases;
+    });
+    document.querySelectorAll("#sosmedEditList .admin-edit-row").forEach((row, si) => {
+      const platformInput = row.querySelector(".input-sosmed-platform");
+      const handleInput = row.querySelector(".input-sosmed-handle");
+      const urlInput = row.querySelector(".input-sosmed-url");
+      if(draftSosmed[si]) {
+        draftSosmed[si].platform = platformInput ? platformInput.value : "";
+        draftSosmed[si].handle = handleInput ? handleInput.value : "";
+        draftSosmed[si].url = urlInput ? urlInput.value : "";
+      }
+    });
+    const fBox = document.getElementById("footerEditFormBox");
+    if(fBox) {
+      draftFooter = {
+        title1: fBox.querySelector("#f_title1").value,
+        desc1: fBox.querySelector("#f_desc1").value,
+        title2: fBox.querySelector("#f_title2").value,
+        title3: fBox.querySelector("#f_title3").value,
+        contactTitle: fBox.querySelector("#f_contactTitle").value,
+        contactDesc: fBox.querySelector("#f_contactDesc").value,
+        copyright: fBox.querySelector("#f_copyright").value
+      };
+    }
+  }
+  document.getElementById("saveAdminChanges").addEventListener("click", async () => {
+    const statusEl = document.getElementById("saveStatus");
+    statusEl.textContent = "Menyimpan ke Firebase...";
+   
+    syncDraftFromDOM();
+    try {
+      const cleanJadwal = draftJadwal.map(d => ({
+        ...d,
+        hari: d.hari.trim(),
+        mapel: d.mapel.map(m => ({ nama: m.nama.trim(), jam: m.jam.trim() })).filter(m => m.nama)
+      }));
+      const cleanPiket = draftPiket.map(r => ({ ...r, hari: r.hari.trim(), petugas: r.petugas.map(p => p.trim()).filter(Boolean) }));
+      const cleanSosmed = draftSosmed.map(s => ({ ...s, platform: s.platform.trim(), handle: s.handle.trim(), url: s.url.trim() })).filter(s => s.platform);
+      const cleanFooter = {
+        title1: draftFooter.title1.trim(),
+        desc1: draftFooter.desc1.trim(),
+        title2: draftFooter.title2.trim(),
+        title3: draftFooter.title3.trim(),
+        contactTitle: draftFooter.contactTitle.trim(),
+        contactDesc: draftFooter.contactDesc.trim(),
+        copyright: draftFooter.copyright.trim()
+      };
+     
+      await set(fbRefs.jadwalRef, cleanJadwal);
+      await set(fbRefs.piketRef, cleanPiket);
+      await set(fbRefs.sosmedRef, cleanSosmed);
+      await set(fbRefs.footerRef, cleanFooter);
+     
+      statusEl.textContent = "Berhasil disimpan & diperbarui di database!";
+    } catch (err) {
+      statusEl.textContent = "Gagal menyimpan: " + err.message;
+    }
+  });
+
+
+  updateAuthUI();
+  renderJadwal();
+  renderPiket();
+  renderSosmed();
+  renderFooter();
+
+
+  const observerOptions = { threshold: 0.15 };
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("active");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+  document.querySelectorAll(".reveal").forEach(section => {
+    observer.observe(section);
+  });
+</script>
+</body>
+</html>
+
